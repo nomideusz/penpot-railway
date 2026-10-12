@@ -1,6 +1,6 @@
 # Deploy and Host Penpot on Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/penpot-production?utm_medium=integration&utm_source=button&utm_campaign=penpot-production)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/penpot-production?referralCode=sLjDXb&utm_medium=integration&utm_source=button&utm_campaign=penpot-production)
 
 [Penpot](https://penpot.app/) is the open-source design and prototyping platform, the self-hostable alternative to Figma: vector design, components and variants, design tokens, flex and grid layout, interactive prototypes and real-time multiplayer editing, with an inspect mode that hands developers CSS, SVG and HTML. Files use open standards (SVG, CSS) and you can import your Figma work. This template runs the official Penpot images, pinned, with Postgres, Valkey and a Railway bucket for every uploaded image, font and thumbnail.
 
