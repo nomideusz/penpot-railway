@@ -1,0 +1,9 @@
+{
+  "name": "Penpot | Open-Source Figma Alternative with Postgres & S3",
+  "short_name": "Penpot Production",
+  "description": "Collaborative design and prototyping tool, the open-source Figma alt",
+  "category": "Other",
+  "image": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+  "card_desc": "Penpot: the open-source Figma alternative. Real-time collaborative design, prototyping, components and design tokens, with CSS/SVG inspect for developers, on Postgres and a Railway bucket.",
+  "deploy_marker": "penpotapp/frontend:2.18.3"
+}

@@ -1,0 +1,310 @@
+{
+  "buckets": {
+    "2456e7b0-0027-429a-a949-724ac3ccbd78": {
+      "name": "Assets"
+    }
+  },
+  "services": {
+    "1b2e43eb-e23d-40a4-a762-ee3234670750": {
+      "icon": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+      "name": "Penpot",
+      "build": {},
+      "deploy": {
+        "startCommand": "/bin/bash -c \"printf 'upstream penpot-backend { zone penpot-backend 64k; server %s resolve; } upstream penpot-exporter { zone penpot-exporter 64k; server %s resolve; }' $BACKEND_ADDRESS $EXPORTER_ADDRESS > /etc/nginx/overrides/http.d/railway-upstreams.conf && bash /entrypoint.sh true && sed -i 's/^worker_processes auto;/worker_processes 2;/' /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'\"",
+        "healthcheckPath": "/",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "penpotapp/frontend:2.18.3"
+      },
+      "networking": {
+        "serviceDomains": {
+          "<hasDomain>": {}
+        }
+      },
+      "volumeMounts": {},
+      "variables": {
+        "PORT": {
+          "defaultValue": "8080",
+          "description": "Port the Penpot web server listens on - leave as is",
+          "isOptional": false
+        },
+        "PENPOT_PUBLIC_URI": {
+          "defaultValue": "${{Backend.PENPOT_PUBLIC_URI}}",
+          "description": "Public URL - edit it on the Backend service",
+          "isOptional": false
+        },
+        "PENPOT_FLAGS": {
+          "defaultValue": "${{Backend.PENPOT_FLAGS}}",
+          "description": "Feature flags - edit them on the Backend service",
+          "isOptional": false
+        },
+        "BACKEND_ADDRESS": {
+          "defaultValue": "${{Backend.RAILWAY_PRIVATE_DOMAIN}}:6060",
+          "description": "Backend API on the private network, re-resolved while running so backend redeploys never leave a stale address",
+          "isOptional": false
+        },
+        "EXPORTER_ADDRESS": {
+          "defaultValue": "${{Exporter.RAILWAY_PRIVATE_DOMAIN}}:6061",
+          "description": "Exporter on the private network",
+          "isOptional": false
+        },
+        "PENPOT_BACKEND_URI": {
+          "defaultValue": "http://penpot-backend",
+          "description": "nginx upstream defined by the start command from BACKEND_ADDRESS - leave as is",
+          "isOptional": false
+        },
+        "PENPOT_EXPORTER_URI": {
+          "defaultValue": "http://penpot-exporter",
+          "description": "nginx upstream defined by the start command from EXPORTER_ADDRESS - leave as is",
+          "isOptional": false
+        }
+      }
+    },
+    "4e2ef587-87e8-4396-8e94-2d6af88d5c7e": {
+      "icon": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+      "name": "Backend",
+      "build": {},
+      "deploy": {
+        "startCommand": null,
+        "healthcheckPath": "/readyz",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "penpotapp/backend:2.18.3"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {},
+      "variables": {
+        "PORT": {
+          "defaultValue": "6060",
+          "description": "Port the backend API listens on - leave as is",
+          "isOptional": false
+        },
+        "PENPOT_HTTP_SERVER_PORT": {
+          "defaultValue": "6060",
+          "description": "Backend API port - must match PORT",
+          "isOptional": false
+        },
+        "PENPOT_HTTP_SERVER_HOST": {
+          "defaultValue": "::",
+          "description": "Listen on IPv6 and IPv4 so Railway's private network can reach it",
+          "isOptional": false
+        },
+        "PENPOT_PUBLIC_URI": {
+          "defaultValue": "https://${{Penpot.RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public URL of Penpot (links, invitations, exports) - set it to your custom domain after adding one; the other services follow",
+          "isOptional": false
+        },
+        "PENPOT_FLAGS": {
+          "defaultValue": "disable-email-verification",
+          "description": "Feature flags shared by all Penpot services. Add disable-registration once your team has signed up; add enable-smtp after setting the PENPOT_SMTP_* variables",
+          "isOptional": false
+        },
+        "JAVA_OPTS": {
+          "defaultValue": "-Xms128m -Xmx1g",
+          "description": "JVM heap limits. Without a cap the JVM sizes its heap from the host's memory; raise -Xmx for very large design files",
+          "isOptional": false
+        },
+        "PENPOT_SECRET_KEY": {
+          "defaultValue": "${{secret(64, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Master key that sessions, invitations and the exporter's key are derived from. Changing it logs everyone out",
+          "isOptional": false
+        },
+        "PENPOT_DATABASE_URI": {
+          "defaultValue": "postgresql://${{Postgres.RAILWAY_PRIVATE_DOMAIN}}:5432/${{Postgres.POSTGRES_DB}}",
+          "description": "Postgres on the private network",
+          "isOptional": false
+        },
+        "PENPOT_DATABASE_USERNAME": {
+          "defaultValue": "${{Postgres.POSTGRES_USER}}",
+          "description": "Database user",
+          "isOptional": false
+        },
+        "PENPOT_DATABASE_PASSWORD": {
+          "defaultValue": "${{Postgres.POSTGRES_PASSWORD}}",
+          "description": "Database password",
+          "isOptional": false
+        },
+        "PENPOT_REDIS_URI": {
+          "defaultValue": "redis://default:${{Valkey.VALKEY_PASSWORD}}@${{Valkey.RAILWAY_PRIVATE_DOMAIN}}:6379/0",
+          "description": "Valkey on the private network (real-time notifications)",
+          "isOptional": false
+        },
+        "PENPOT_OBJECTS_STORAGE_BACKEND": {
+          "defaultValue": "s3",
+          "description": "Uploads, images, fonts and thumbnails go to the Railway bucket",
+          "isOptional": false
+        },
+        "PENPOT_OBJECTS_STORAGE_S3_BUCKET": {
+          "defaultValue": "${{Assets.BUCKET}}",
+          "description": "Bucket name",
+          "isOptional": false
+        },
+        "PENPOT_OBJECTS_STORAGE_S3_REGION": {
+          "defaultValue": "${{Assets.REGION}}",
+          "description": "Bucket region",
+          "isOptional": false
+        },
+        "AWS_ENDPOINT_URL_S3": {
+          "defaultValue": "${{Assets.ENDPOINT}}",
+          "description": "Bucket endpoint, read by the AWS SDK. Deliberately not PENPOT_OBJECTS_STORAGE_S3_ENDPOINT: that one forces path-style URLs, and Railway buckets are virtual-hosted",
+          "isOptional": false
+        },
+        "AWS_ACCESS_KEY_ID": {
+          "defaultValue": "${{Assets.ACCESS_KEY_ID}}",
+          "description": "Bucket access key",
+          "isOptional": false
+        },
+        "AWS_SECRET_ACCESS_KEY": {
+          "defaultValue": "${{Assets.SECRET_ACCESS_KEY}}",
+          "description": "Bucket secret key",
+          "isOptional": false
+        },
+        "RAILWAY_HEALTHCHECK_TIMEOUT_SEC": {
+          "defaultValue": "600",
+          "description": "First boot runs the database migrations before the health check can pass",
+          "isOptional": false
+        }
+      }
+    },
+    "5b794b80-1445-467b-b4bc-48227c4595f3": {
+      "icon": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+      "name": "Exporter",
+      "build": {},
+      "deploy": {
+        "startCommand": null,
+        "healthcheckPath": "/readyz",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "penpotapp/exporter:2.18.3"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {},
+      "variables": {
+        "PORT": {
+          "defaultValue": "6061",
+          "description": "Port the exporter listens on - leave as is",
+          "isOptional": false
+        },
+        "PENPOT_HTTP_SERVER_PORT": {
+          "defaultValue": "6061",
+          "description": "Exporter port - must match PORT",
+          "isOptional": false
+        },
+        "PENPOT_PUBLIC_URI": {
+          "defaultValue": "${{Backend.PENPOT_PUBLIC_URI}}",
+          "description": "Public URL - edit it on the Backend service",
+          "isOptional": false
+        },
+        "PENPOT_FLAGS": {
+          "defaultValue": "${{Backend.PENPOT_FLAGS}}",
+          "description": "Feature flags - edit them on the Backend service",
+          "isOptional": false
+        },
+        "PENPOT_SECRET_KEY": {
+          "defaultValue": "${{Backend.PENPOT_SECRET_KEY}}",
+          "description": "Same master key as the backend, so the backend accepts the exporter's uploads",
+          "isOptional": false
+        },
+        "PENPOT_INTERNAL_URI": {
+          "defaultValue": "http://${{Penpot.RAILWAY_PRIVATE_DOMAIN}}:8080",
+          "description": "The headless browser renders exports from the Penpot web server over the private network",
+          "isOptional": false
+        },
+        "PENPOT_REDIS_URI": {
+          "defaultValue": "redis://default:${{Valkey.VALKEY_PASSWORD}}@${{Valkey.RAILWAY_PRIVATE_DOMAIN}}:6379/0?family=0",
+          "description": "Valkey on the private network (family=0 lets it connect over IPv6)",
+          "isOptional": false
+        }
+      }
+    },
+    "eac928f3-5efe-4553-9c12-17196f65d187": {
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "name": "Postgres",
+      "build": {},
+      "deploy": {
+        "startCommand": null,
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "postgres:17.11-alpine"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {
+        "8490a663-b955-4399-bfe2-8ce0b8cdd9d2": {
+          "mountPath": "/var/lib/postgresql/data"
+        }
+      },
+      "variables": {
+        "POSTGRES_DB": {
+          "defaultValue": "penpot",
+          "description": "Database name",
+          "isOptional": false
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "penpot",
+          "description": "Database user",
+          "isOptional": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Auto-generated database password",
+          "isOptional": false
+        },
+        "POSTGRES_INITDB_ARGS": {
+          "defaultValue": "--data-checksums",
+          "description": "Same initdb options as upstream's compose file",
+          "isOptional": false
+        },
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Data subdirectory - keeps Postgres happy on Railway volumes",
+          "isOptional": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Time for Postgres to shut down cleanly on redeploy",
+          "isOptional": false
+        }
+      }
+    },
+    "842809b4-4625-4bd9-ad31-24296d2c2e09": {
+      "icon": "https://devicons.railway.app/i/redis.svg",
+      "name": "Valkey",
+      "build": {},
+      "deploy": {
+        "startCommand": "/bin/sh -c \"exec docker-entrypoint.sh valkey-server --requirepass $VALKEY_PASSWORD --save '' --appendonly no --maxmemory 128mb --maxmemory-policy volatile-lfu\"",
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "valkey/valkey:8.1.10-alpine"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {},
+      "variables": {
+        "VALKEY_PASSWORD": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Auto-generated Valkey password",
+          "isOptional": false
+        }
+      }
+    }
+  }
+}
