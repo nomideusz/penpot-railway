@@ -49,7 +49,7 @@ The stack is five services and a bucket: Penpot (the web app), Backend, Exporter
 
 **Not included.** Upstream's optional admin console and MCP server (AI-assistant integration) are not part of this template, keeping it lean.
 
-**Resources.** In testing the backend (a JVM, heap capped at 1 GB by `JAVA_OPTS` on Backend) idled at 0.9–1.1 GB, the exporter at 140–430 MB (its headless browser stays warm after an export), the web server around 60 MB, Postgres around 125 MB and Valkey under 10 MB: roughly 1.3–1.8 GB for the stack. That needs the Hobby plan; it does not fit the Trial plan's 512 MB per service.
+**Resources.** Measured idle on Railway after signing up, uploading an image and running an export: backend (a JVM, heap capped at 1 GB by `JAVA_OPTS` on Backend) about 1.05 GB, exporter 140 MB (up to ~400 MB while its headless browser is warm after an export), Postgres about 230 MB, the web server about 65 MB and Valkey 15 MB: roughly 1.5 GB for the stack, up to ~1.8 GB while exporting. That needs the Hobby plan; it does not fit the Trial plan's 512 MB per service.
 
 ## Why Deploy Penpot on Railway?
 
