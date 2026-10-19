@@ -6,7 +6,7 @@
   },
   "services": {
     "1b2e43eb-e23d-40a4-a762-ee3234670750": {
-      "icon": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+      "icon": "https://raw.githubusercontent.com/two-workspaces/penpot/main/icon.svg",
       "name": "Penpot",
       "build": {},
       "deploy": {
@@ -63,7 +63,7 @@
       }
     },
     "4e2ef587-87e8-4396-8e94-2d6af88d5c7e": {
-      "icon": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+      "icon": "https://raw.githubusercontent.com/two-workspaces/penpot/main/icon.svg",
       "name": "Backend",
       "build": {},
       "deploy": {
@@ -173,7 +173,7 @@
       }
     },
     "5b794b80-1445-467b-b4bc-48227c4595f3": {
-      "icon": "https://raw.githubusercontent.com/nomideusz/penpot-railway/main/icon.svg",
+      "icon": "https://raw.githubusercontent.com/two-workspaces/penpot/main/icon.svg",
       "name": "Exporter",
       "build": {},
       "deploy": {

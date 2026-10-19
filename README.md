@@ -33,7 +33,7 @@ The stack is five services and a bucket: Penpot (the web app), Backend, Exporter
 - [Penpot self-hosting documentation](https://help.penpot.app/technical-guide/getting-started/)
 - [Penpot configuration reference](https://help.penpot.app/technical-guide/configuration/)
 - [Penpot on GitHub](https://github.com/penpot/penpot)
-- [Template source on GitHub](https://github.com/nomideusz/penpot-railway)
+- [Template source on GitHub](https://github.com/two-workspaces/penpot)
 
 ### Implementation Details
 
